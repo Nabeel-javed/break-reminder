@@ -11,10 +11,34 @@ if [ ! -d "dist/Break Reminder.app" ]; then
     exit 1
 fi
 
-echo "Running app with verbose output..."
-echo "Press Ctrl+C to stop"
+echo "📂 Checking app structure..."
 echo ""
-echo "==== App Output ===="
 
-# Run the app directly from its executable to see error messages
-"dist/Break Reminder.app/Contents/MacOS/BreakReminder"
+# Show what's in the MacOS directory
+if [ -d "dist/Break Reminder.app/Contents/MacOS" ]; then
+    echo "Contents of MacOS directory:"
+    ls -la "dist/Break Reminder.app/Contents/MacOS/"
+    echo ""
+
+    # Find the executable (usually the first file)
+    EXECUTABLE=$(find "dist/Break Reminder.app/Contents/MacOS/" -type f -perm +111 | head -n 1)
+
+    if [ -n "$EXECUTABLE" ]; then
+        echo "Found executable: $EXECUTABLE"
+        echo ""
+        echo "Running app with verbose output..."
+        echo "Press Ctrl+C to stop"
+        echo ""
+        echo "==== App Output ===="
+        "$EXECUTABLE"
+    else
+        echo "❌ No executable found in MacOS directory"
+        echo ""
+        echo "Try rebuilding with: ./build_app.sh"
+    fi
+else
+    echo "❌ MacOS directory not found"
+    echo ""
+    echo "App structure:"
+    ls -lR "dist/Break Reminder.app/" | head -30
+fi
