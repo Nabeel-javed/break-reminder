@@ -27,7 +27,7 @@ class BreakReminderApp(rumps.App):
 
     def __init__(self):
         super(BreakReminderApp, self).__init__(
-            name="20/20/20 Break Reminder",
+            name="BreakReminder",
             title="👁️",
             quit_button=None
         )
