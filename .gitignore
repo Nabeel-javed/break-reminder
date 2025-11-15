@@ -36,5 +36,9 @@ ENV/
 .AppleDouble
 .LSOverride
 
+# Build artifacts
+*.dmg
+dmg_temp/
+
 # Config
 config.json
