@@ -286,10 +286,12 @@ class BreakReminderApp(rumps.App):
 
                     self.time_remaining -= elapsed
 
-                    # Update menu title
+                    # Update menu title and menu bar display
                     minutes = int(self.time_remaining // 60)
                     seconds = int(self.time_remaining % 60)
                     self.menu['Time until break: --:--'].title = f'Time until break: {minutes:02d}:{seconds:02d}'
+                    # Update the menu bar icon to show countdown in real-time
+                    self.title = f'👁️ {minutes:02d}:{seconds:02d}'
 
                     # Check if it's time for a break
                     if self.time_remaining <= 0 and not self.notification_shown:
