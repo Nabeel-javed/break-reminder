@@ -56,9 +56,9 @@ class BreakReminderApp(rumps.App):
         # Build menu
         self.build_menu()
 
-        # Start timer thread
-        self.timer_thread = threading.Thread(target=self.run_timer, daemon=True)
-        self.timer_thread.start()
+        # Start timer using rumps.Timer (runs on main thread)
+        self.update_timer = rumps.Timer(self.run_timer, 1)
+        self.update_timer.start()
 
     def load_config(self):
         """Load configuration from file"""
@@ -265,49 +265,45 @@ class BreakReminderApp(rumps.App):
             print(f"Error getting idle time: {e}")
         return 0
 
-    def run_timer(self):
-        """Main timer loop"""
-        while True:
-            try:
-                if self.timer_running:
-                    # Check if system is idle
-                    if self.pause_on_idle:
-                        idle_time = self.get_idle_time()
-                        if idle_time > self.idle_threshold:
-                            # System is idle, don't decrement timer
-                            self.last_update = time.time()
-                            time.sleep(1)
-                            continue
+    def run_timer(self, _):
+        """Main timer callback - called every second by rumps.Timer"""
+        try:
+            if self.timer_running:
+                # Check if system is idle
+                if self.pause_on_idle:
+                    idle_time = self.get_idle_time()
+                    if idle_time > self.idle_threshold:
+                        # System is idle, don't decrement timer
+                        self.last_update = time.time()
+                        return
 
-                    # Update timer
-                    current_time = time.time()
-                    elapsed = current_time - self.last_update
-                    self.last_update = current_time
+                # Update timer
+                current_time = time.time()
+                elapsed = current_time - self.last_update
+                self.last_update = current_time
 
-                    self.time_remaining -= elapsed
+                self.time_remaining -= elapsed
 
-                    # Update menu title and menu bar display
-                    minutes = int(self.time_remaining // 60)
-                    seconds = int(self.time_remaining % 60)
-                    self.menu['Time until break: --:--'].title = f'Time until break: {minutes:02d}:{seconds:02d}'
-                    # Update the menu bar icon to show countdown in real-time
-                    self.title = f'👁️ {minutes:02d}:{seconds:02d}'
+                # Update menu title and menu bar display
+                minutes = int(self.time_remaining // 60)
+                seconds = int(self.time_remaining % 60)
+                self.menu['Time until break: --:--'].title = f'Time until break: {minutes:02d}:{seconds:02d}'
+                # Update the menu bar icon to show countdown in real-time
+                self.title = f'👁️ {minutes:02d}:{seconds:02d}'
 
-                    # Check if it's time for a break
-                    if self.time_remaining <= 0 and not self.notification_shown:
-                        self.show_break_notification()
-                        self.notification_shown = True
+                # Check if it's time for a break
+                if self.time_remaining <= 0 and not self.notification_shown:
+                    self.show_break_notification()
+                    self.notification_shown = True
 
-                    # Escalate to fullscreen if popup ignored for 10 seconds
-                    elif self.time_remaining <= -10 and self.notification_shown and not self.notification_escalated:
-                        if self.notification_type == 'popup':
-                            self.show_fullscreen_break()
-                            self.notification_escalated = True
+                # Escalate to fullscreen if popup ignored for 10 seconds
+                elif self.time_remaining <= -10 and self.notification_shown and not self.notification_escalated:
+                    if self.notification_type == 'popup':
+                        self.show_fullscreen_break()
+                        self.notification_escalated = True
 
-                time.sleep(1)
-            except Exception as e:
-                print(f"Timer error: {e}")
-                time.sleep(1)
+        except Exception as e:
+            print(f"Timer error: {e}")
 
     def play_sound(self):
         """Play notification sound"""
