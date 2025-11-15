@@ -57,17 +57,11 @@ This creates a proper macOS `.app` that you can install once and forget about.
    cp -r "dist/Break Reminder.app" /Applications/
    ```
 
-5. **Enable auto-start at login**
-   - Open **System Settings** (or System Preferences on older macOS)
-   - Go to **Users & Groups** → **Login Items**
-   - Click the **+** button
-   - Select **Break Reminder** from Applications
-   - Done! The app will now start automatically when you log in
-
-6. **Launch the app**
+5. **Launch the app**
    - Open from Applications folder or Spotlight (Cmd+Space, type "Break Reminder")
    - You'll see 👁️ in your menu bar
-   - No Terminal needed anymore!
+   - The app will ask if you want to enable auto-start - click "Yes, Auto-Start"!
+   - That's it! No Terminal needed anymore!
 
 #### Optional: Create a DMG Installer
 
