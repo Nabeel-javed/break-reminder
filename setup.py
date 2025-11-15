@@ -3,6 +3,7 @@ Setup script for building the Break Reminder macOS app with py2app
 """
 
 from setuptools import setup
+import sys
 
 APP = ['break_reminder.py']
 DATA_FILES = []
@@ -18,9 +19,22 @@ OPTIONS = {
         'CFBundleShortVersionString': '1.0.0',
         'NSHumanReadableCopyright': 'Copyright © 2024',
         'LSUIElement': True,  # This makes it a menu bar app (no dock icon)
+        'NSAppleEventsUsageDescription': 'This app needs to access System Events to add itself to Login Items.',
     },
-    'packages': ['rumps', 'tkinter'],
-    'includes': ['subprocess', 'json', 'time', 'threading'],
+    'packages': ['rumps', 'tkinter', 'PIL'],
+    'includes': [
+        'subprocess',
+        'json',
+        'time',
+        'threading',
+        'pathlib',
+        'os',
+        'datetime',
+    ],
+    'frameworks': [],
+    'excludes': ['numpy', 'matplotlib'],  # Exclude unused heavy packages
+    'semi_standalone': False,
+    'site_packages': True,
 }
 
 setup(
