@@ -504,70 +504,10 @@ class BreakReminderApp(rumps.App):
             ok='OK'
         )
 
-    def check_is_in_login_items(self):
-        """Check if app is already in Login Items"""
-        try:
-            # Get the app bundle path
-            result = subprocess.run(
-                ['osascript', '-e', 'tell application "System Events" to get the name of every login item'],
-                capture_output=True,
-                text=True,
-                timeout=5
-            )
-            login_items = result.stdout.strip()
-            # Check if "Break Reminder" or "BreakReminder" is in login items
-            return 'Break Reminder' in login_items or 'BreakReminder' in login_items
-        except Exception as e:
-            print(f"Error checking login items: {e}")
-            return False
-
-    def add_to_login_items(self):
-        """Add app to Login Items using AppleScript"""
-        try:
-            # Get the path to the running app
-            app_path = os.path.abspath(__file__)
-
-            # If running as .app bundle, get the bundle path
-            if '.app/Contents/' in app_path:
-                # Extract path to .app bundle
-                bundle_path = app_path.split('.app/Contents/')[0] + '.app'
-            else:
-                # Running from Python directly - can't add to Login Items
-                rumps.alert(
-                    title='Cannot Add to Login Items',
-                    message='Auto-start only works when running as a standalone .app bundle.\n\n'
-                            'To enable auto-start:\n'
-                            '1. Build the app: ./build_app.sh\n'
-                            '2. Install to Applications\n'
-                            '3. Relaunch from Applications\n\n'
-                            'See README for details.',
-                    ok='OK'
-                )
-                return False
-
-            # Use AppleScript to add to Login Items
-            script = f'''
-                tell application "System Events"
-                    make new login item at end with properties {{path:"{bundle_path}", hidden:false}}
-                end tell
-            '''
-
-            result = subprocess.run(
-                ['osascript', '-e', script],
-                capture_output=True,
-                text=True,
-                timeout=5
-            )
-
-            if result.returncode == 0:
-                return True
-            else:
-                print(f"Error adding to login items: {result.stderr}")
-                return False
-
-        except Exception as e:
-            print(f"Error adding to login items: {e}")
-            return False
+    def check_auto_start_enabled(self):
+        """Check if LaunchAgent is installed for auto-start"""
+        launch_agent_path = Path.home() / 'Library' / 'LaunchAgents' / 'com.breakreminder.app.plist'
+        return launch_agent_path.exists()
 
     def prompt_auto_start(self):
         """Prompt user to enable auto-start on first launch"""
@@ -575,27 +515,20 @@ class BreakReminderApp(rumps.App):
         self.config['first_launch'] = False
         self.save_config()
 
-        # Check if already in login items
-        if self.check_is_in_login_items():
+        # Check if LaunchAgent is already set up
+        if self.check_auto_start_enabled():
             return
 
-        # Show prompt
+        # Show informational prompt
         response = rumps.alert(
             title='Welcome to Break Reminder! 👁️',
             message='Would you like Break Reminder to start automatically when you log in?\n\n'
-                    'This ensures you never forget to take eye breaks!',
-            ok='Yes, Auto-Start',
-            cancel='No Thanks'
+                    'To enable auto-start, run this command in Terminal:\n'
+                    './setup_autostart.sh\n\n'
+                    'See the README for details.',
+            ok='Got it!',
+            cancel=None
         )
-
-        if response == 1:  # User clicked "Yes, Auto-Start"
-            success = self.add_to_login_items()
-            if success:
-                rumps.notification(
-                    title='Auto-Start Enabled! ✅',
-                    subtitle='',
-                    message='Break Reminder will now start automatically when you log in.'
-                )
 
     def quit_app(self, _):
         """Quit the application"""
