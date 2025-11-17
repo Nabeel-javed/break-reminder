@@ -29,9 +29,7 @@ This simple practice helps:
 - macOS 10.14 or later
 - Python 3.8 or later
 
-### Option 1: Standalone App (Recommended - No Terminal Required!)
-
-This creates a proper macOS `.app` that you can install once and forget about.
+### Quick Start
 
 1. **Clone or download this repository**
    ```bash
@@ -46,59 +44,21 @@ This creates a proper macOS `.app` that you can install once and forget about.
    ./install.sh
    ```
 
-3. **Build the standalone app**
-   ```bash
-   chmod +x build_app.sh
-   ./build_app.sh
-   ```
-
-4. **Install to Applications**
-   ```bash
-   cp -r "dist/Break Reminder.app" /Applications/
-   ```
-
-5. **Launch the app**
-   - Open from Applications folder or Spotlight (Cmd+Space, type "Break Reminder")
-   - You'll see 👁️ in your menu bar
-   - The app will ask if you want to enable auto-start - click "Yes, Auto-Start"!
-   - That's it! No Terminal needed anymore!
-
-#### Optional: Create a DMG Installer
-
-To create a distributable DMG file:
-```bash
-chmod +x create_dmg.sh
-./create_dmg.sh
-```
-
-This creates `BreakReminder-Installer.dmg` that you can share or reinstall later.
-
-### Option 2: Run from Terminal (For Development)
-
-1. **Clone or download this repository**
-   ```bash
-   cd ~/Downloads
-   git clone <repository-url>
-   cd break-reminder
-   ```
-
-2. **Run the installation script**
-   ```bash
-   chmod +x install.sh
-   ./install.sh
-   ```
-
 3. **Start the app**
    ```bash
    source venv/bin/activate
-   python break_reminder.py
+   python3 break_reminder.py
    ```
 
-4. **Enable auto-start (Optional)**
+   You'll see the 👁️ icon with a countdown in your menu bar!
+
+4. **Enable auto-start (Recommended)**
    ```bash
    chmod +x setup_autostart.sh
    ./setup_autostart.sh
    ```
+
+That's it! The app will now start automatically when you log in.
 
 ## Usage
 
